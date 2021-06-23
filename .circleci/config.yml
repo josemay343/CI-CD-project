@@ -43,7 +43,7 @@ jobs:
       - run:
           name: Build front-end
           command: |
-            # Your code here
+            # Your code her
             cd frontend
             sudo npm update
             sudo npm install npm@latest -g
