@@ -44,7 +44,11 @@ jobs:
           name: Build front-end
           command: |
             # Your code here
-            exit 1
+            cd frontend
+            sudo npm update
+            sudo npm install npm@latest -g
+            sudo npm install webpack
+            sudo npm run build
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
@@ -60,7 +64,10 @@ jobs:
           name: Back-end build
           command: |
              # Your code here
-             exit 1
+             cd backend
+             sudo npm install npm@latest -g
+             sudo npm -i --save-dev standard-version
+             sudo npm run build
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
