@@ -173,10 +173,6 @@ jobs:
     docker:
       - image: 'cimg/base:stable'
     steps:
-      - run:
-          name: job failure
-          command: |
-            return 1
       - slack/notify:
           channel: devops
           event: fail
