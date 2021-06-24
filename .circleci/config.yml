@@ -86,7 +86,7 @@ jobs:
           name: test frontend
           command: |
             cd frontend
-            sudo npm install
+            sudo npm install jest
             sudo npm run test
                 
   test-backend:
@@ -104,7 +104,7 @@ jobs:
           name: test backend
           command: |
             cd backend
-            sudo npm install
+            sudo npm install jest
             sudo npm run test
             
 #   scan-frontend:
