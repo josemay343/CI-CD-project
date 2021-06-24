@@ -66,7 +66,6 @@ jobs:
              # Your code here
              cd backend
              sudo npm install npm@latest -g
-             sudo npm -i --save-dev standard-version
              sudo npm run build
       - save_cache:
           paths: [backend/node_modules]
