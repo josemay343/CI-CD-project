@@ -3,7 +3,7 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.4.2
 
-# commands:
+commands:
 #   destroy-environment:
 #     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
 #     parameters:
@@ -34,7 +34,13 @@ orbs:
 #             #  Add revert code here. You can find this in the Getting Started section.
 #               exit 1
 #             fi
-            
+
+  slack-notify-failure:
+    steps:
+      - slack/notify:
+          channel: devops
+          event: fail
+          template: basic_fail_1
 jobs:
   build-frontend:
     docker:
@@ -61,6 +67,8 @@ jobs:
             - frontend/dist
           key: frontend-build-${CIRCLE_WORKFLOW_ID}
 
+      - slack-notify-failure
+
   build-backend:
     docker:
       - image: circleci/node:13.8.0
@@ -83,6 +91,8 @@ jobs:
             - backend/node_modules
             - backend/dist
           key: backend-build-${CIRCLE_WORKFLOW_ID:0:7}
+
+      - slack-notify-failure
 
   test-frontend:
     docker:
@@ -107,6 +117,7 @@ jobs:
       # - save_cache:
       #     paths: [frontend/node_modules]
       #     key: frontend-test
+      - slack-notify-failure
                 
   test-backend:
     docker:
@@ -130,6 +141,7 @@ jobs:
       # - save_cache:
       #     paths: [backend/node_modules]
       #     key: backend-test
+      - slack-notify-failure
             
   scan-frontend:
     docker:
@@ -150,6 +162,8 @@ jobs:
             npm install
             npm audit fix --audit-level=critical
 
+      - slack-notify-failure
+
   scan-backend:
     docker:
       # Docker image here
@@ -169,14 +183,16 @@ jobs:
             npm install
             npm audit fix --audit-level=critical
 
-  slack-notify-failure:
-    docker:
-      - image: 'cimg/base:stable'
-    steps:
-      - slack/notify:
-          channel: devops
-          event: fail
-          template: basic_fail_1
+      - slack-notify-failure
+
+  # slack-notify-failure:
+  #   docker:
+  #     - image: 'cimg/base:stable'
+  #   steps:
+  #     - slack/notify:
+  #         channel: devops
+  #         event: fail
+  #         template: basic_fail_1
 
 #   deploy-infrastructure:
 #     docker:
