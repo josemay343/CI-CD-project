@@ -111,29 +111,45 @@ jobs:
           name: test backend
           command: |
             cd backend
-            # sudo npm i
-            # sudo npm update
             sudo npm install --save-dev jest
             sudo npm run test
       - save_cache:
           paths: [backend/node_modules]
           key: backend-test
             
-#   scan-frontend:
-#     docker:
-#       # Docker image here
-#     steps:
-#       # Checkout code from git
-#       # Restore from cache
-#       # Your job code here
+  scan-frontend:
+    docker:
+      # Docker image here
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      # Restore from cache
+      - restore_cache:
+          keys: [frontend-build]
+      # Your job code here
+      - run:
+          name: scan frontend
+          command: |
+            cd frontend
+            sudo npm audit --audit-level=critical
 
-#   scan-backend:
-#     docker:
-#       # Docker image here
-#     steps:
-#       # Checkout code from git
-#       # Restore from cache
-#       # Your job code here
+  scan-backend:
+    docker:
+      # Docker image here
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      # Restore from cache
+      - restore_cache:
+          keys: [backend-build]
+      # Your job code here
+      - run:
+          name: scan backend
+          command:
+            cd backend
+            npm audit --audit-level=critical
 
 #   deploy-infrastructure:
 #     docker:
