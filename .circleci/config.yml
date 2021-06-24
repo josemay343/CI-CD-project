@@ -86,13 +86,14 @@ jobs:
              #sudo npm i --save-dev standard-version
              #sudo npm install --save-dev jest
              sudo npm run build
+
+      - slack-notify-failure
       - save_cache:
           paths: 
             - backend/node_modules
             - backend/dist
           key: backend-build-${CIRCLE_WORKFLOW_ID:0:7}
 
-      - slack-notify-failure
 
   test-frontend:
     docker:
@@ -377,9 +378,12 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
+      - build-frontend:
+          context: slack-secrets
+      - build-backend:
+          context: slack-secrets
       # - test-frontend:
+          # context: slack-secrets
       #     requires: [build-frontend]
       # - test-backend:
       #     requires: [build-backend]
