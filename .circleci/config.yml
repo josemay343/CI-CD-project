@@ -45,11 +45,12 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
-            sudo npm update
-            sudo npm install npm@latest -g
-            sudo npm install webpack
-            sudo npm install oauth-sign
-            sudo npm install --save-dev jest
+            sudo npm install
+            # sudo npm update
+            # sudo npm install npm@latest -g
+            # sudo npm install webpack
+            # sudo npm install oauth-sign
+            # sudo npm install --save-dev jest
             sudo npm run build
       - save_cache:
           paths:
@@ -71,8 +72,8 @@ jobs:
              # Your code here
              cd backend
              sudo npm install
-             sudo npm i --save-dev standard-version
-             sudo npm install --save-dev jest
+             #sudo npm i --save-dev standard-version
+             #sudo npm install --save-dev jest
              sudo npm run build
       - save_cache:
           paths: 
@@ -120,7 +121,8 @@ jobs:
           name: test backend
           command: |
             cd backend
-            sudo npm install --save-dev jest
+            sudo npm install
+            # sudo npm install --save-dev jest
             sudo npm run test
       # - save_cache:
       #     paths: [backend/node_modules]
@@ -142,7 +144,7 @@ jobs:
           name: scan frontend
           command: |
             cd frontend
-            npm update
+            npm install
             npm audit --audit-level=critical
 
   scan-backend:
@@ -161,7 +163,7 @@ jobs:
           name: scan backend
           command: |
             cd backend
-            npm update
+            npm install
             npm audit --audit-level=critical
 
 #   deploy-infrastructure:
