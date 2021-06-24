@@ -103,7 +103,7 @@ jobs:
       - run:
           name: test backend
           command: |
-            cd backedn
+            cd backend
             sudo npm install
             sudo npm run test
             
