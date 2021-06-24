@@ -86,7 +86,9 @@ jobs:
           name: test frontend
           command: |
             cd frontend
-            sudo npm install jest
+            sudo npm i
+            sudo npm update
+            sudo npm install --save-dev jest
             sudo npm run test
                 
   test-backend:
@@ -104,7 +106,9 @@ jobs:
           name: test backend
           command: |
             cd backend
-            sudo npm install jest
+            sudo npm i
+            sudo npm update
+            sudo npm install --save-dev jest
             sudo npm run test
             
 #   scan-frontend:
