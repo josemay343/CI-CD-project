@@ -174,7 +174,7 @@ jobs:
       - image: 'cimg/base:stable'
     steps:
       - slack/notify:
-          channel: '#devops'
+          channel: devops
           event: fail
           template: basic_fail_1
 
