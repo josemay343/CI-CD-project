@@ -89,6 +89,7 @@ jobs:
             sudo npm i
             sudo npm update
             sudo npm install --save-dev jest
+            sudo npm install oauth-sign
             sudo npm run test
       - save_cache:
           paths: [frontend/node_modules]
