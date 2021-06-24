@@ -43,7 +43,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-build-${CIRCLE_WORKFLOW_ID}
+            - frontend-build-${CIRCLE_WORKFLOW_ID:0:7}
       - run:
           name: Build front-end
           command: |
@@ -68,7 +68,7 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-build-${CIRCLE_WORKFLOW_ID}
+            - backend-build-${CIRCLE_WORKFLOW_ID:0:7}
       - run:
           name: Back-end build
           command: |
@@ -82,7 +82,7 @@ jobs:
           paths: 
             - backend/node_modules
             - backend/dist
-          key: backend-build-${CIRCLE_WORKFLOW_ID}
+          key: backend-build-${CIRCLE_WORKFLOW_ID:0:7}
 
   test-frontend:
     docker:
@@ -94,7 +94,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys: 
-            - frontend-build-${CIRCLE_WORKFLOW_ID}
+            - frontend-build-${CIRCLE_WORKFLOW_ID:0:7}
       # Your job code here
       - run:
           name: test frontend
@@ -118,7 +118,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-            - backend-build-${CIRCLE_WORKFLOW_ID}
+            - backend-build-${CIRCLE_WORKFLOW_ID:0:7}
       # Your job code here
       - run:
           name: test backend
@@ -141,7 +141,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-            - frontend-build-${CIRCLE_WORKFLOW_ID}
+            - frontend-build-${CIRCLE_WORKFLOW_ID:0:7}
       # Your job code here
       - run:
           name: scan frontend
@@ -160,7 +160,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-            - backend-build-${CIRCLE_WORKFLOW_ID}
+            - backend-build-${CIRCLE_WORKFLOW_ID:0:7}
       # Your job code here
       - run:
           name: scan backend
@@ -171,13 +171,10 @@ jobs:
 
   slack-notify-failure:
     docker:
-      - image: circleci/node:13.8.0
+      - image: 'cimg/base:stable'
     steps:
-      - checkout
-      - run:
-          command: npm run deploy
       - slack/notify:
-          channel: devops
+          channel: '#devops'
           event: fail
           template: basic_fail_1
 
