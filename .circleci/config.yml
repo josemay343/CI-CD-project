@@ -62,10 +62,10 @@ jobs:
             sudo rm -rf node_modules/
             sudo npm install
             # sudo npm update
-            # sudo npm install npm@latest -g
-            # sudo npm install webpack
-            # sudo npm install oauth-sign
-            # sudo npm install --save-dev jest
+            sudo npm install npm@latest -g
+            sudo npm install webpack
+            sudo npm install oauth-sign
+            sudo npm install --save-dev jest
             sudo npm run build
       - save_cache:
           paths:
