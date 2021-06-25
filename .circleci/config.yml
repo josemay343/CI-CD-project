@@ -261,26 +261,38 @@ jobs:
       # Here's where you will add some code to rollback on failure 
       - destroy-environment
 
-#   configure-infrastructure:
-#     docker:
-#       # Docker image here that supports Ansible
-#       - image: python:3.7-alpine3.13
-#     steps:
-#       # Checkout code from git
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Configure server
-#           command: |
-#             # Your code here
-#             exit 1
-#       # Here's where you will add some code to rollback on failure      
-
+  configure-infrastructure:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.13
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ['1b:13:5b:1b:2d:fa:29:99:25:01:c6:a4:7f:6d:b1:e4']
+      # attach workspace
+      - run:
+          name: Install dependencies
+          command: |
+            # Your code here
+            apk add --update tar gzip ansible nodejs npm curl
+            pip install awscli
+      - run:
+          name: Create Inventory file
+          command: |
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - run:
+          name: Configure server
+          command: |
+            # Your code here
+            cd .circleci/ansible
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i inventory.txt configure-server.yml
+      # Here's where you will add some code to rollback on failure      
+      - destroy-environment
 #   run-migrations:
 #     docker:
 #       # Docker image here that supports NodeJS
