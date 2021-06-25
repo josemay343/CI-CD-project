@@ -59,6 +59,7 @@ jobs:
           name: Build front-end
           command: |
             cd frontend
+            sudo rm -rf node_modules/
             sudo npm install
             # sudo npm update
             # sudo npm install npm@latest -g
@@ -87,6 +88,7 @@ jobs:
           command: |
              # Your code here
              cd backend
+             sudo rm -rf node_modules/
              sudo npm install
              #sudo npm i --save-dev standard-version
              #sudo npm install --save-dev jest
