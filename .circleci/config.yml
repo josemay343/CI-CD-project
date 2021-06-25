@@ -56,17 +56,21 @@ jobs:
           keys:
             - frontend-build
       - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install
+            npm install oauth-sign
+      - run:
           name: Build front-end
           command: |
             cd frontend
-            # sudo rm -rf node_modules/
-            sudo npm i
             # sudo npm update
             # sudo npm install npm@latest -g
             # sudo npm install webpack
             # sudo npm install oauth-sign
             # sudo npm install --save-dev jest
-            sudo npm run build
+            npm run build
       - save_cache:
           paths:
             - frontend/node_modules
@@ -89,10 +93,10 @@ jobs:
              # Your code here
              cd backend
              #  sudo rm -rf node_modules/
-             sudo npm i
+             npm install
              #sudo npm i --save-dev standard-version
              #sudo npm install --save-dev jest
-             sudo npm run build
+             npm run build
 
       - slack-notify-failure
       - save_cache:
@@ -115,16 +119,20 @@ jobs:
             - frontend-build
       # Your job code here
       - run:
+          name: Install dependencies
+          command: |
+            cd frontend
+            npm install
+            npm install oauth-sign
+      - run:
           name: test frontend
           command: |
             cd frontend
-            sudo npm i
+            # sudo npm i
             # sudo npm update
             # sudo npm install --save-dev jest
             sudo npm run test
-      # - save_cache:
-      #     paths: [frontend/node_modules]
-      #     key: frontend-test
+
       - slack-notify-failure
                 
   test-backend:
@@ -143,9 +151,9 @@ jobs:
           name: test backend
           command: |
             cd backend
-            sudo npm i
+            npm install
             # sudo npm install --save-dev jest
-            sudo npm run test
+            npm run test
       # - save_cache:
       #     paths: [backend/node_modules]
       #     key: backend-test
@@ -438,8 +446,8 @@ workflows:
           filters:
             branches:
               only: [master]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
       # - run-migrations:
       #     requires: [configure-infrastructure]
       # - deploy-frontend:
