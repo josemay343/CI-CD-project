@@ -116,7 +116,7 @@ jobs:
           name: test frontend
           command: |
             cd frontend
-            sudo npm install
+            # sudo npm install
             # sudo npm update
             # sudo npm install --save-dev jest
             sudo npm run test
@@ -141,7 +141,7 @@ jobs:
           name: test backend
           command: |
             cd backend
-            sudo npm install
+            # sudo npm install
             # sudo npm install --save-dev jest
             sudo npm run test
       # - save_cache:
