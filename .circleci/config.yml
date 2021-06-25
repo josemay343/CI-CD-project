@@ -54,13 +54,13 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - frontend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            - frontend-build
       - run:
           name: Build front-end
           command: |
             cd frontend
-            sudo rm -rf node_modules/
-            sudo npm install
+            # sudo rm -rf node_modules/
+            sudo npm i
             # sudo npm update
             # sudo npm install npm@latest -g
             # sudo npm install webpack
@@ -70,8 +70,8 @@ jobs:
       - save_cache:
           paths:
             - frontend/node_modules
-            - frontend/dist
-          key: frontend-build-${CIRCLE_WORKFLOW_ID}
+            # - frontend/dist
+          key: frontend-build
 
       - slack-notify-failure
 
@@ -82,14 +82,14 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - backend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            - backend-build
       - run:
           name: Back-end build
           command: |
              # Your code here
              cd backend
-             sudo rm -rf node_modules/
-             sudo npm install
+             #  sudo rm -rf node_modules/
+             sudo npm i
              #sudo npm i --save-dev standard-version
              #sudo npm install --save-dev jest
              sudo npm run build
@@ -98,8 +98,8 @@ jobs:
       - save_cache:
           paths: 
             - backend/node_modules
-            - backend/dist
-          key: backend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            # - backend/dist
+          key: backend-build
 
 
   test-frontend:
@@ -112,13 +112,13 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys: 
-            - frontend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            - frontend-build
       # Your job code here
       - run:
           name: test frontend
           command: |
             cd frontend
-            sudo npm install
+            sudo npm i
             # sudo npm update
             # sudo npm install --save-dev jest
             sudo npm run test
@@ -137,13 +137,13 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-            - backend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            - backend-build
       # Your job code here
       - run:
           name: test backend
           command: |
             cd backend
-            sudo npm install
+            sudo npm i
             # sudo npm install --save-dev jest
             sudo npm run test
       # - save_cache:
@@ -161,7 +161,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-            - frontend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            - frontend-build
       # Your job code here
       - run:
           name: scan frontend
@@ -182,7 +182,7 @@ jobs:
       # Restore from cache
       - restore_cache:
           keys:
-            - backend-build-${CIRCLE_WORKFLOW_ID:0:7}
+            - backend-build
       # Your job code here
       - run:
           name: scan backend
