@@ -21,24 +21,25 @@ commands:
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
 
-#   revert-migrations:
-#     description: Revert the last migration if successfully run in the current workflow.
-#     parameters:
-#       # Add parameter here     
-#     steps:
-#       - run:
-#           name: Revert migrations
-#           # Add when this will run
-#           command: |
-#             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
-#             SUCCESS = 1
-#             if(( $SUCCESS==1 )); 
-#             then
-#             #  cd ~/project/backend
-#             #  npm install
-#             #  Add revert code here. You can find this in the Getting Started section.
-#               exit 1
-#             fi
+  revert-migrations:
+    description: Revert the last migration if successfully run in the current workflow.
+    # parameters:
+      # Add parameter here     
+    steps:
+      - run:
+          name: Revert migrations
+          # Add when this will run
+          when: on_fail
+          command: |
+            # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
+            SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7} " --request GET https://api.memstash.io/values/migrations_data)
+            if(( ${SUCCESS}==1 )); 
+            then
+             cd backend
+             npm install
+            #  Add revert code here. You can find this in the Getting Started section.
+              npm run migrations:revert
+            fi
 
   slack-notify-failure:
     steps:
@@ -250,15 +251,6 @@ jobs:
             --request PUT \
             --data "$BACKEND_IP" \
             https://api.memstash.io/values/url_backend_ip
-
-            
-
-            # export backend_IP=$(aws ec2 describe-instances \
-            #   --query 'Reservations[*].Instances[*].PublicIpAddress' \
-            #   --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            #   --output text >> .circleci/ansible/inventory.txt)
-
-            # cat .circleci/ansible/inventory.txt
             
       - slack-notify-failure
       
@@ -301,47 +293,80 @@ jobs:
             ansible-playbook -i inventory.txt configure-server.yml
       # Here's where you will add some code to rollback on failure      
       - destroy-environment
-#   run-migrations:
-#     docker:
-#       # Docker image here that supports NodeJS
-#       - image: amazon/aws-cli
-#     steps:
-#       # Checkout code from git
-#       - checkout
-#       - run:
-#           name: Run migrations
-#           command: |
-#             # Your code here
-#             exit 1
-#       - run:
-#           name: Send migration results to memstash
-#           command: |
-#             # Your code here
-#             exit 1
-#      # Here's where you will add some code to rollback on failure      
+  run-migrations:
+    docker:
+      # Docker image here that supports NodeJS
+      - image: circleci/node:13.8.0
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Run migrations
+          command: |
+            # Your code here
+            cd backend
+            npm install
+            npm run migrations > migration_data.txt
+            cat migration_data.txt
+      - run:
+          name: Send migration results to memstash
+          command: |
+            # Your code here
+            if grep -q "has been executed successfully" migration_data.txt
+            then
+              echo "Migrations success, updating memstash"
+              curl -H "Content-Type: text/plain" \
+              -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" \
+              --request PUT \
+              --data "1" \
+              https://api.memstash.io/values/migrations_data
+            else
+              echo "Migraitons failed"
+              curl -H "Content-Type: text/plain" \
+              -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" \
+              --request PUT \
+              --data "0" \
+              https://api.memstash.io/values/migrations_data
+            fi
+            # RESPONSE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migrations_data)"
+            # echo "$RESPONSE"
+            echo "${CIRCLE_WORKFLOW_ID:0:7}"
+      - destroy-environment
+      - revert-migrations
+            
+     # Here's where you will add some code to rollback on failure      
 
-#   deploy-frontend:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#       - image: amazon/aws-cli
-#     steps:
-#       # Checkout code from git
-#       - checkout
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#             export API_URL="http://${BACKEND_IP}:3030"
-#             echo "${API_URL}"
-#       - run:
-#           name: Deploy frontend objects
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure      
+  deploy-frontend:
+    docker:
+      # Docker image here that supports AWS CLI
+      - image: amazon/aws-cli
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            yum -y install nodejs
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+      - run:
+          name: Deploy frontend objects
+          command: |
+            # your code here
+            cd frontend
+            npm install
+            npm install oauth-sign
+            npm run build
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} -- recursive
+            
+      - destroy-environment
+      # Here's where you will add some code to rollback on failure      
                     
 #   deploy-backend:
 #     docker:
