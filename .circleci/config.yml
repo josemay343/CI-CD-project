@@ -304,6 +304,8 @@ jobs:
           name: Run migrations
           command: |
             # Your code here
+            echo printenv
+            printenv >> ./backend/.env
             cd backend
             npm install
             npm run migrations > migration_data.txt
@@ -368,24 +370,38 @@ jobs:
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
                     
-#   deploy-backend:
-#     docker:
-#       # Docker image here that supports Ansible
-#       - image: python:3.7-alpine3.13
-#     steps:
-#       # Checkout code from git
-#       - checkout
-#       # Add ssh keys with fingerprint
-#       # attach workspace
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Deploy backend
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  deploy-backend:
+    docker:
+      # Docker image here that supports Ansible
+      - image: python:3.7-alpine3.13
+    steps:
+      # Checkout code from git
+      - checkout
+      # Add ssh keys with fingerprint
+      - add_ssh_keys:
+          fingerprints: ['1b:13:5b:1b:2d:fa:29:99:25:01:c6:a4:7f:6d:b1:e4']
+      # attach workspace
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            apk add --update ansible
+            apk add --update curl
+      - run:
+          name: Build inventory
+          command: |
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+      - run:
+          name: Deploy backend
+          command: |
+            printenv >> ./backend/.env
+            cd .circleci/ansible/inventory.txt
+            ansible-playbook -i inventory.txt deploy-backend.yml
+            # your code here
+
+      # Here's where you will add some code to rollback on failure  
 
 #   smoke-test:
 #     docker:
