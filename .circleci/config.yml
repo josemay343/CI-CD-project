@@ -358,7 +358,7 @@ jobs:
             # RESPONSE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migrations_data)"
             # echo "$RESPONSE"
             echo "${CIRCLE_WORKFLOW_ID:0:7}"
-      - destroy-environment
+      # - destroy-environment
       - revert-migrations
             
      # Here's where you will add some code to rollback on failure      
