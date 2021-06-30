@@ -330,10 +330,10 @@ jobs:
           name: Run migrations
           command: |
             npm install
-            npm run build
             npm install typescript
             # npm i -g pm2
-            npm run migrations > migration_data.txt
+            touch migration_data.txt
+            npm run migrations >> migration_data.txt
             cat migration_data.txt
       - run:
           name: Send migration results to memstash
