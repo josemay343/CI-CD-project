@@ -18,7 +18,7 @@ commands:
           command: |
             # Your code here
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
-            aws s3 rm s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migrations:
@@ -306,17 +306,15 @@ jobs:
             sudo apt-get -y -qq update
             sudo apt-get -qq install awscli
       - run:
-          name: Run migrations
+          name: create backend .env files
           command: |
             # Your code here
             # echo printenv
             # printenv >> ./backend/.env
             cd backend
-            npm install
-            npm install typescript
-            npm i -g pm2
+            touch .env
 
-            echo ENVIRONMENT=$ENVIRONMENT > ".env"
+            echo ENVIRONMENT=$ENVIRONMENT >> ".env"
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ".env"
             echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> ".env"
             echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> ".env"
@@ -326,7 +324,15 @@ jobs:
             echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
             echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
-            cat backend/.env
+            cat .env
+
+      - run:
+          name: Run migrations
+          command: |
+            npm install
+            npm run build
+            npm install typescript
+            # npm i -g pm2
             npm run migrations > migration_data.txt
             cat migration_data.txt
       - run:
