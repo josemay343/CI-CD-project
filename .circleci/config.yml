@@ -18,7 +18,7 @@ commands:
           command: |
             # Your code here
             aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID}
-            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID} --recursive
+            aws s3 rm s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID} --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID}
 
   revert-migrations:
@@ -313,8 +313,8 @@ jobs:
             printenv >> ./backend/.env
             cd backend
             npm install
-            npm install typrescript
-            
+            npm install typescript
+
             echo ENVIRONMENT=$ENVIRONMENT > ".env"
             echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ".env"
             echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> ".env"
@@ -382,7 +382,7 @@ jobs:
             npm install
             npm install oauth-sign
             npm run build
-            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} -- recursive
+            aws s3 cp ./dist s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} -- recursive
 
       - destroy-environment
       # Here's where you will add some code to rollback on failure      
