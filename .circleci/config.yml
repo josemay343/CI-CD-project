@@ -17,7 +17,7 @@ commands:
           when: on_fail
           command: |
             # Your code here
-            aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
+            # aws cloudformation delete-stack --stack-name udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
             aws cloudformation delete-stack --stack-name udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
@@ -460,6 +460,7 @@ jobs:
             # echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
             # echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
             # echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
+            # echo ${TYPEORM_DATABASE}
             # cat .env
             cd .circleci/ansible/
             ansible-playbook -i inventory.txt deploy-backend.yml
@@ -526,7 +527,7 @@ jobs:
               return 0
             fi
       # Here's where you will add some code to rollback on failure  
-      # - destroy-environment
+      - destroy-environment
       - revert-migrations
 
 #   cloudfront-update:
