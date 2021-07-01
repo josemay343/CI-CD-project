@@ -555,7 +555,7 @@ jobs:
           command: |
             # your code here
             cd .circleci
-            Past_ID=$(PastWorkFlowID.txt)
+            Past_ID=$(cat PastWorkFlowID.txt)
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --stack-name udapeople-cloudfront-${Past_ID} \
