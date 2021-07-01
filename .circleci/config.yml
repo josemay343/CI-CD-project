@@ -554,8 +554,7 @@ jobs:
           name: Update cloudfront distribution
           command: |
             # your code here
-            cd .circleci
-            Past_ID=$(cat PastWorkFlowID.txt)
+            Past_ID=$(cat .circleci/PastWorkFlowID.txt)
             aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --stack-name udapeople-cloudfront-${Past_ID} \
