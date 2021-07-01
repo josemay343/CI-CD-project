@@ -549,7 +549,7 @@ jobs:
               list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
               --no-paginate --output text)
             echo ${ID} > .circleci/PastWorkFlowID.txt
-            cat PastWorkFlowID.txt
+            cat .circleci/PastWorkFlowID.txt
       - run:
           name: Update cloudfront distribution
           command: |
@@ -627,5 +627,5 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]
