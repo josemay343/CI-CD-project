@@ -331,6 +331,7 @@ jobs:
             npm install
             npm install typescript
             # npm i -g pm2
+            npm run migrations:revert
             touch migration_data.txt
             npm run migrations >> migration_data.txt
             cat migration_data.txt
@@ -464,11 +465,15 @@ jobs:
           command: |
             # your code here
             # curl ${API_URL}
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            echo ${BACKEND_IP}
+            export API_URL="http://${BACKEND_IP}:3030/api/status"
+            echo ${API_URL}
             if curl -s ${API_URL} | grep "ok"
             then
-              exit 0
+              return 0
             else
-              exit 1
+              return 1
             fi
       - run:
           name: Frontend smoke test.
@@ -477,9 +482,9 @@ jobs:
             URL="c"
             if curl -s ${URL} | grep "Welcome"
             then
-              exit 1
+              return 1
             else
-              exit 0
+              return 0
             fi
       # Here's where you will add some code to rollback on failure  
       - destroy-environment
