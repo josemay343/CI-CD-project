@@ -35,8 +35,8 @@ commands:
             SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7} " --request GET https://api.memstash.io/values/migrations_data)
             if(( ${SUCCESS}==1 )); 
             then
-             cd backend
-             npm install
+              cd backend
+              npm install
             #  Add revert code here. You can find this in the Getting Started section.
               npm run migrations:revert
             fi
@@ -331,7 +331,7 @@ jobs:
             npm install
             npm install typescript
             # npm i -g pm2
-            npm run migrations:revert
+            # npm run migrations:revert
             touch migration_data.txt
             npm run migrations >> migration_data.txt
             cat migration_data.txt
@@ -417,15 +417,16 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add ansible
+            apk add --update ansible
             apk add curl
             pip3 install awscli
       - run:
           name: Build inventory
           command: |
+            cd .circleci/ansible
             BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
-            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
+            echo ${BACKEND_IP} >> inventory.txt
+            cat inventory.txt
       - run:
           name: Deploy backend
           command: |
