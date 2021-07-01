@@ -383,16 +383,18 @@ jobs:
             # your code here
             BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo "${API_URL}"
+            echo ${API_URL} >> frontend/.env
+            echo ${API_URL}
       - run:
           name: Deploy frontend objects
           command: |
             # your code here
             cd frontend
             npm install
+            npm install webpack-dev-server -g
             npm install oauth-sign
             npm run build
-            aws s3 sync ./dist s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - destroy-environment
       - revert-migrations
@@ -426,7 +428,7 @@ jobs:
           name: Deploy backend
           command: |
             # printenv >> ./backend/.envg
-            cd .circleci/ansible/inventory.txt
+            cd .circleci/ansible/
             ansible-playbook -i inventory.txt deploy-backend.yml
             # your code here
 
@@ -435,30 +437,45 @@ jobs:
       - revert-migrations
 
 
-#   smoke-test:
-#     docker:
-#       # Lightweight Docker image 
-#       - image: python:3.7-alpine3.13
-#     steps:
-#       # Checkout code from git
-#       - checkout
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Get backend url
-#           command: |
-#             # your code here
-#       - run:
-#           name: Backend smoke test.
-#           command: |
-#             # your code here
-#       - run:
-#           name: Frontend smoke test.
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  smoke-test:
+    docker:
+      # Lightweight Docker image 
+      - image: python:3.7-alpine3.13
+    steps:
+      # Checkout code from git
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            apk add curl
+            pip3 install awscli
+      - run:
+          name: Get backend url
+          command: |
+            # your code here
+            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            echo ${BACKEND_IP}
+            export API_URL="https://${BACKEND_IP}:3030/api/status"
+      - run:
+          name: Backend smoke test.
+          command: |
+            # your code here
+            curl -s $API_URL
+      - run:
+          name: Frontend smoke test.
+          command: |
+            # your code here
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-us-east-2.amazonaws.com/index.html#/employees"
+            if curl -s ${URL} | grep "Welcome"
+            then
+              return 0
+            else
+              return 1
+            fi
+      # Here's where you will add some code to rollback on failure  
+      - destroy-environment
+      - revert-migrations
 
 #   cloudfront-update:
 #     docker:
