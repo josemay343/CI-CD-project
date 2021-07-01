@@ -304,13 +304,11 @@ jobs:
           name: Install awscli
           command: |
             sudo apt-get -y -qq update
-            sudo apt-get -qq install awscli
+            # sudo apt-get -qq install awscli
       - run:
           name: create backend .env files
           command: |
             # Your code here
-            # echo printenv
-            # printenv >> ./backend/.env
             cd backend
             touch .env
 
@@ -375,7 +373,8 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            yum -y install nodejs
+            yum install nodejs -y
+
       - run:
           name: Get backend url
           command: |
@@ -391,9 +390,10 @@ jobs:
             npm install
             npm install oauth-sign
             npm run build
-            aws s3 cp ./dist s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7} -- recursive
+            aws s3 sync ./dist s3://udapeople-frontend-${CIRCLE_WORKFLOW_ID:0:7}
 
       - destroy-environment
+      - revert-migrations
       # Here's where you will add some code to rollback on failure      
                     
   deploy-backend:
@@ -428,6 +428,8 @@ jobs:
             # your code here
 
       # Here's where you will add some code to rollback on failure  
+      - revert-migrations
+
 
 #   smoke-test:
 #     docker:
