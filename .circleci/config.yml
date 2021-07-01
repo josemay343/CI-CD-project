@@ -244,7 +244,7 @@ jobs:
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text)
 
-            echo ${BACKEND_IP}
+            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
 
             curl -H "Content-Type: text/plain" \
             -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" \
@@ -254,12 +254,13 @@ jobs:
             
       - slack-notify-failure
       
-      # - persist_to_workspace:
-      #     root: ~/
-      #     paths:
-      #       - project/.circleci/ansible/inventory.txt
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
       # Here's where you will add some code to rollback on failure 
       - destroy-environment
+      - revert-migrations
 
   configure-infrastructure:
     docker:
@@ -272,18 +273,20 @@ jobs:
       - add_ssh_keys:
           fingerprints: ['1b:13:5b:1b:2d:fa:29:99:25:01:c6:a4:7f:6d:b1:e4']
       # attach workspace
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
             # Your code here
             apk add --update tar gzip ansible nodejs npm curl
             pip install awscli
-      - run:
-          name: Create Inventory file
-          command: |
-            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
-            echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
-            cat .circleci/ansible/inventory.txt
+      # - run:
+      #     name: Create Inventory file
+      #     command: |
+      #       BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+      #       echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
+      #       cat .circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
@@ -378,7 +381,8 @@ jobs:
             apk add curl
             apk add --update npm
             pip3 install awscli
-
+      - attach_workspace:
+          at: ~/
       - run:
           name: Get backend url
           command: |
@@ -402,6 +406,11 @@ jobs:
             npm run build
             aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/frontend/.env
+
       - destroy-environment
       - revert-migrations
       # Here's where you will add some code to rollback on failure      
@@ -417,27 +426,41 @@ jobs:
       - add_ssh_keys:
           fingerprints: ['1b:13:5b:1b:2d:fa:29:99:25:01:c6:a4:7f:6d:b1:e4']
       # attach workspace
+      - attach_workspace:
+          at: ~/
       - run:
           name: Install dependencies
           command: |
             apk add --update ansible
             apk add curl
             pip3 install awscli
-      - run:
-          name: Build inventory
-          command: |
-            cd .circleci/ansible
-            # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
-            BACKEND_IP=$(aws ec2 describe-instances \
-            --query "Reservations[*].Instances[*].PublicIpAddress" \
-            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-            --output text)
-            echo ${BACKEND_IP} >> inventory.txt
-            cat inventory.txt
+      # - run:
+      #     name: Build inventory
+      #     command: |
+      #       cd .circleci/ansible
+      #       # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+      #       BACKEND_IP=$(aws ec2 describe-instances \
+      #       --query "Reservations[*].Instances[*].PublicIpAddress" \
+      #       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #       --output text)
+      #       echo ${BACKEND_IP} >> inventory.txt
+      #       cat inventory.txt
       - run:
           name: Deploy backend
           command: |
             # printenv >> ./backend/.envg
+            # cd backend
+            # echo ENVIRONMENT=$ENVIRONMENT >> ".env"
+            # echo TYPEORM_CONNECTION=$TYPEORM_CONNECTION >> ".env"
+            # echo TYPEORM_MIGRATIONS_DIR=$TYPEORM_MIGRATIONS_DIR >> ".env"
+            # echo TYPEORM_ENTITIES=$TYPEORM_ENTITIES >> ".env"
+            # echo TYPEORM_MIGRATIONS=$TYPEORM_MIGRATIONS >> ".env"
+            # echo TYPEORM_HOST=$TYPEORM_HOST >> ".env"
+            # echo TYPEORM_PORT=$TYPEORM_PORT >> ".env"
+            # echo TYPEORM_USERNAME=$TYPEORM_USERNAME >> ".env"
+            # echo TYPEORM_PASSWORD=$TYPEORM_PASSWORD >> ".env"
+            # echo TYPEORM_DATABASE=$TYPEORM_DATABASE >> ".env"
+            # cat .env
             cd .circleci/ansible/
             ansible-playbook -i inventory.txt deploy-backend.yml
             # your code here
@@ -495,7 +518,7 @@ jobs:
           name: Frontend smoke test.
           command: |
             # your code here
-            URL="c"
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-us-east-1.amazonaws.com"
             if curl -s ${URL} | grep "Welcome"
             then
               return 1
