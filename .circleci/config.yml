@@ -425,7 +425,7 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            # printenv >> ./backend/.env
+            # printenv >> ./backend/.envg
             cd .circleci/ansible/inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
             # your code here
@@ -525,8 +525,8 @@ workflows:
           requires: [configure-infrastructure]
       - deploy-frontend:
           requires: [run-migrations]
-      # - deploy-backend:
-      #     requires: [run-migrations]
+      - deploy-backend:
+          requires: [run-migrations]
       # - smoke-test:
       #     requires: [deploy-backend, deploy-frontend]
       # - cloudfront-update:
