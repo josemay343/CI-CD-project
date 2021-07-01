@@ -383,7 +383,11 @@ jobs:
           name: Get backend url
           command: |
             # your code here
-            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            BACKEND_IP=$(aws ec2 describe-instances \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
             export API_URL="http://${BACKEND_IP}:3030"
             echo ${API_URL} >> frontend/.env
             echo ${API_URL}
@@ -423,7 +427,11 @@ jobs:
           name: Build inventory
           command: |
             cd .circleci/ansible
-            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            BACKEND_IP=$(aws ec2 describe-instances \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
             echo ${BACKEND_IP} >> inventory.txt
             cat inventory.txt
       - run:
@@ -450,22 +458,30 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add curl
+            apk add --update curl nodejs npm
             pip3 install awscli
-      - run:
-          name: Get backend url
-          command: |
-            # your code here
-            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
-            echo ${BACKEND_IP}
-            export API_URL="http://${BACKEND_IP}:3030/api/status"
-            echo ${API_URL}
+      # - run:
+      #     name: Get backend url
+      #     command: |
+      #       # your code here
+      #       # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+      #       BACKEND_IP=$(aws ec2 describe-instances \
+      #       --query "Reservations[*].Instances[*].PublicIpAddress" \
+      #       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+      #       --output text)
+      #       echo ${BACKEND_IP}
+      #       export API_URL="http://${BACKEND_IP}:3030/api/status"
+      #       echo ${API_URL}
       - run:
           name: Backend smoke test.
           command: |
             # your code here
             # curl ${API_URL}
-            BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
+            BACKEND_IP=$(aws ec2 describe-instances \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+            --output text)
             echo ${BACKEND_IP}
             export API_URL="http://${BACKEND_IP}:3030/api/status"
             echo ${API_URL}
@@ -487,7 +503,7 @@ jobs:
               return 0
             fi
       # Here's where you will add some code to rollback on failure  
-      - destroy-environment
+      # - destroy-environment
       - revert-migrations
 
 #   cloudfront-update:
