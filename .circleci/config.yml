@@ -365,7 +365,7 @@ jobs:
   deploy-frontend:
     docker:
       # Docker image here that supports AWS CLI
-      - image: amazon/aws-cli
+      - image: python:3.7-alpine3.11
     steps:
       # Checkout code from git
       - checkout
@@ -373,7 +373,9 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            yum install nodejs -y
+            apk add curl
+            apk add --update npm
+            pip3 install awscli
 
       - run:
           name: Get backend url
@@ -411,8 +413,9 @@ jobs:
           name: Install dependencies
           command: |
             # your code here
-            apk add --update ansible
-            apk add --update curl
+            apk add ansible
+            apk add curl
+            pip3 install awscli
       - run:
           name: Build inventory
           command: |
@@ -422,12 +425,13 @@ jobs:
       - run:
           name: Deploy backend
           command: |
-            printenv >> ./backend/.env
+            # printenv >> ./backend/.env
             cd .circleci/ansible/inventory.txt
             ansible-playbook -i inventory.txt deploy-backend.yml
             # your code here
 
-      # Here's where you will add some code to rollback on failure  
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment
       - revert-migrations
 
 
