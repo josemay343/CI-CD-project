@@ -33,6 +33,7 @@ commands:
           command: |
             # Curl command here to see if there was a successful migration associated with the workflow id, store result in SUCCESS variable
             SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7} " --request GET https://api.memstash.io/values/migrations_data)
+            echo ${SUCCESS}
             if(( ${SUCCESS}==1 )); 
             then
               cd backend
@@ -554,7 +555,7 @@ jobs:
           command: |
             # your code here
             Past_ID=$(cat .circleci/PastWorkFlowID.txt)
-            aws cloudformation update-stack \
+            aws cloudformation deploy \
               --template-file .circleci/files/cloudfront.yml \
               --stack-name cloudfront-stack-${Past_ID} \
               --tags project=udapeople \
