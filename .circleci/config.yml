@@ -307,7 +307,7 @@ jobs:
           name: Install awscli
           command: |
             sudo apt-get -y -qq update
-            # sudo apt-get -qq install awscli
+            sudo apt-get -qq install awscli
       - run:
           name: create backend .env files
           command: |
@@ -359,9 +359,9 @@ jobs:
               --data "0" \
               https://api.memstash.io/values/migrations_data
             fi
-            RESPONSE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migrations_data)"
-            echo "$RESPONSE"
-            echo "${CIRCLE_WORKFLOW_ID:0:7}"
+            RESPONSE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migrations_data)
+            echo $RESPONSE
+            echo ${CIRCLE_WORKFLOW_ID:0:7}
       - destroy-environment
       - revert-migrations
             
