@@ -35,7 +35,7 @@ commands:
             SUCCESS=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7} " --request GET https://api.memstash.io/values/migrations_data)
             if(( ${SUCCESS}==1 )); 
             then
-              cd /backend
+              cd backend
               npm install
             #  Add revert code here. You can find this in the Getting Started section.
               npm run migrations:revert
@@ -359,8 +359,8 @@ jobs:
               --data "0" \
               https://api.memstash.io/values/migrations_data
             fi
-            # RESPONSE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migrations_data)"
-            # echo "$RESPONSE"
+            RESPONSE=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/migrations_data)"
+            echo "$RESPONSE"
             echo "${CIRCLE_WORKFLOW_ID:0:7}"
       - destroy-environment
       - revert-migrations
@@ -554,9 +554,9 @@ jobs:
           command: |
             # your code here
             Past_ID=$(cat .circleci/PastWorkFlowID.txt)
-            aws cloudformation deploy \
+            aws cloudformation update-stack \
               --template-file .circleci/files/cloudfront.yml \
-              --stack-name udapeople-cloudfront-${Past_ID} \
+              --stack-name cloudfront-stack-${Past_ID} \
               --tags project=udapeople \
               --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}"
       # Here's where you will add some code to rollback on failure  
