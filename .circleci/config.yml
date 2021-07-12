@@ -434,17 +434,6 @@ jobs:
             apk add --update ansible
             apk add curl
             pip3 install awscli
-      # - run:
-      #     name: Build inventory
-      #     command: |
-      #       cd .circleci/ansible
-      #       # BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
-      #       BACKEND_IP=$(aws ec2 describe-instances \
-      #       --query "Reservations[*].Instances[*].PublicIpAddress" \
-      #       --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-      #       --output text)
-      #       echo ${BACKEND_IP} >> inventory.txt
-      #       cat inventory.txt
       - run:
           name: Deploy backend
           command: |
