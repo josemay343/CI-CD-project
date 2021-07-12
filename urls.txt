@@ -1,5 +1,5 @@
-[URL01]=
-[URL02]=
-[URL03]=
-[URL04]=
-[URL05]=
+[URL01]=https://github.com/josemay343/CI-CD-project
+[URL02]=http://udapeople-592b7a2.s3-website-us-east-1.amazonaws.com
+[URL03]=https://d12kr2bwiwko37.cloudfront.net
+[URL04]=http://3.221.159.24:3030/api/status
+[URL05]=http://ec2-54-173-110-5.compute-1.amazonaws.com:9090/graph
