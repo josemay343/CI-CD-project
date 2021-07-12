@@ -282,12 +282,6 @@ jobs:
             # Your code here
             apk add --update tar gzip ansible nodejs npm curl
             pip install awscli
-      # - run:
-      #     name: Create Inventory file
-      #     command: |
-      #       BACKEND_IP=$(curl -H "token: ${CIRCLE_WORKFLOW_ID:0:7}" --request GET https://api.memstash.io/values/url_backend_ip)
-      #       echo ${BACKEND_IP} >> .circleci/ansible/inventory.txt
-      #       cat .circleci/ansible/inventory.txt
       - run:
           name: Configure server
           command: |
