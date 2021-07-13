@@ -179,8 +179,9 @@ jobs:
           name: scan backend
           command: |
             cd backend
-            npm install
-            npm audit fix --audit-level=critical --force
+            npm audit --audit-level=critical
+            # npm install
+            # npm audit fix --audit-level=critical --force
 
       - slack-notify-failure
 
@@ -523,14 +524,14 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
-      # - scan-backend:
-      #     requires: [build-backend]
-      # - scan-frontend:
-      #     requires: [build-frontend]
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
+      - scan-backend:
+          requires: [build-backend]
+      - scan-frontend:
+          requires: [build-frontend]
       # # - slack-notify-failure:
       # #     context: slack-secrets
       # - deploy-infrastructure:
