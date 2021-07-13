@@ -179,9 +179,8 @@ jobs:
           name: scan backend
           command: |
             cd backend
-            npm audit --audit-level=critical
-            # npm install
-            # npm audit fix --audit-level=critical --force
+            npm install
+            npm audit fix --audit-level=critical --force
 
       - slack-notify-failure
 
@@ -532,45 +531,45 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      # # - slack-notify-failure:
-      # #     context: slack-secrets
-      # - deploy-infrastructure:
-      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - configure-infrastructure:
-      #     requires: [deploy-infrastructure]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - run-migrations:
-      #     requires: [configure-infrastructure]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - deploy-frontend:
-      #     requires: [run-migrations]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - deploy-backend:
-      #     requires: [run-migrations]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - smoke-test:
-      #     requires: [deploy-backend, deploy-frontend]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
-      #     filters:
-      #       branches:
-      #         only: [master]
-      # - cleanup:
-      #     requires: [cloudfront-update]
-      #     filters:
-      #       branches:
-      #         only: [master]
+      # - slack-notify-failure:
+      #     context: slack-secrets
+      - deploy-infrastructure:
+          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+          filters:
+            branches:
+              only: [master]
+      - configure-infrastructure:
+          requires: [deploy-infrastructure]
+          filters:
+            branches:
+              only: [master]
+      - run-migrations:
+          requires: [configure-infrastructure]
+          filters:
+            branches:
+              only: [master]
+      - deploy-frontend:
+          requires: [run-migrations]
+          filters:
+            branches:
+              only: [master]
+      - deploy-backend:
+          requires: [run-migrations]
+          filters:
+            branches:
+              only: [master]
+      - smoke-test:
+          requires: [deploy-backend, deploy-frontend]
+          filters:
+            branches:
+              only: [master]
+      - cloudfront-update:
+          requires: [smoke-test]
+          filters:
+            branches:
+              only: [master]
+      - cleanup:
+          requires: [cloudfront-update]
+          filters:
+            branches:
+              only: [master]
