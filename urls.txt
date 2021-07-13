@@ -1,5 +1,5 @@
 [URL01]=https://github.com/josemay343/CI-CD-project
-[URL02]=http://udapeople-fa93732.s3-website-us-east-1.amazonaws.com
-[URL03]=https://d12kr2bwiwko37.cloudfront.net
-[URL04]=http://3.228.12.7:3030/api/status
+[URL02]=http://udapeople-bcef9ef.s3-website-us-east-1.amazonaws.com
+[URL03]=https://d13vohrilwc4xj.cloudfront.net
+[URL04]=http://3.238.106.153:3030/api/status
 [URL05]=http://ec2-54-173-110-5.compute-1.amazonaws.com:9090/graph
