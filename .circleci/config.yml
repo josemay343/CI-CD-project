@@ -159,7 +159,7 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm audit fix --audit-level=critical
+            npm audit fix --audit-level=critical --force
 
       - slack-notify-failure
 
@@ -180,7 +180,7 @@ jobs:
           command: |
             cd backend
             npm install
-            npm audit fix --audit-level=critical
+            npm audit fix --audit-level=critical --force
 
       - slack-notify-failure
 
@@ -345,12 +345,15 @@ jobs:
       - run:
           name: Get backend url
           command: |
+            cd frontend
             BACKEND_IP=$(aws ec2 describe-instances \
             --query "Reservations[*].Instances[*].PublicIpAddress" \
             --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:7}" \
             --output text)
             export API_URL="http://${BACKEND_IP}:3030"
-            echo ${API_URL} >> frontend/.env
+            echo ${API_URL} > .env
+            echo ENVIRONMENT=production >> .env
+            cat .env
             echo ${API_URL}
       - run:
           name: Deploy frontend objects
@@ -358,8 +361,9 @@ jobs:
             # your code here
             npm install webpack-dev-server -g
             cd frontend
+            cat .env
             npm install
-            npm run build
+            npm run build:prod
             aws s3 cp ./dist s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
 
       - persist_to_workspace:
